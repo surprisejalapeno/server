@@ -2,6 +2,7 @@ var entryController = require('../controllers/entryController.js');
 var userController = require('../controllers/userController.js');
 var friendsController = require('../controllers/friendsController.js');
 var requestController = require('../controllers/requestController.js');
+var statsController = require('../controllers/statsController.js');
 
 var utils = require('./utils.js');
 
@@ -20,6 +21,9 @@ module.exports = function(app, express) {
   app.get('/api/friends', friendsController.fetchFriends);
   app.post('/api/friends', friendsController.acceptFriendReq);
 
+  app.use('/api/stats', utils.decode);
+  app.get('/api/stats', statsController.getStats);
+
   app.use('/api/friendreq', utils.decode);
   app.post('/api/friendreq', function(req, res, next) {
     if (req.body.requestId) {
@@ -30,6 +34,4 @@ module.exports = function(app, express) {
   });
   app.get('/api/friendreq', requestController.getRequests);
   app.delete('/api/friendreq', requestController.rejectRequest);
-
-
 }
