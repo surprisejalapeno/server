@@ -63,7 +63,7 @@ var Request = sequelize.define('request', {
 // after creating a new instance of Entry
 Entry.belongsTo(User)
 Request.belongsTo(User)
-Entry.belongsTo(Photo)
+// Entry.belongsTo(Photo)
 
 User.hasMany(Entry);
 User.hasMany(Request);

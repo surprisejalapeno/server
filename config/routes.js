@@ -15,7 +15,8 @@ module.exports = function(app, express) {
   app.post('/api/entries', entryController.createEntry);
   app.get('/api/entries', entryController.getEntries);
 
-  app.post('/api/entriesWithPhoto', [entryWithPhotoController.storePhoto, entryWithPhotoController.createEntries]);
+  // app.post('/api/entriesWithPhoto', [entryWithPhotoController.storePhoto, entryWithPhotoController.createEntries]);
+  app.post('/api/entriesWithPhoto', entryController.createEntry);
   app.get('/api/entriesWithPhoto', entryWithPhotoController.getPhoto);
   // app.get('/api/entriesWithPhoto', entryWithPhotoController.getPhotosFromDBTest); // test to see if photos are posting to db
 
