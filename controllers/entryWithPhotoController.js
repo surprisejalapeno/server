@@ -6,6 +6,7 @@ module.exports = {
 
   storePhoto: function(req, res, next) {
     console.log('inside storePhoto');
+    console.log('storePhoto req:', req);
     console.log('text:', req.body.text);
     var photo = req.body.photo; 
     var photoIdRaw = req.body.photo.uri.slice(2000, 2010);
@@ -19,59 +20,99 @@ module.exports = {
         } else {
             console.log('wrote file to disk');
             req.body['photoId'] = photoId;
-            // next(req);
+            next();
         }
-    }); 
+    })
+
+    // next();
   },
 
   createEntries: function(req, res, next) {
     console.log('inside createPhotoEntry');
-    console.log('createEntries req body:', req.body);
+    console.log('req:', req); // doesn't console.log, breaks
 
-    // var text = req.body.text;
-    // var loc = req.body.loc;
-    // var entryQuery = {text: text, loc: loc};
-    // entryQueryuery['userId'] = req.user.id;
+    var text = req.body.text;
+    var loc = req.body.loc;
+    var photoId = req.body.photoId;
+    var userId = req.user.id;
+    // console.log('user id:', userId); // ERROR cannot read property id of undefined
 
-    // => Query DB to create entry
+    var photoQuery = {photoId: photoId};
 
-    // var photoId = req.body.photoId;
-    // var photoQuery = {photoId: photoId};
+    db.Photo.create(photoQuery)
+      .then(function(newPhotoEntry) {
 
-    // => Query DB to create photo entry
+        var entryQuery = {text: text, loc: loc, photoId: newPhotoEntry.get('id')};
+        entryQuery['userId'] = 100; 
 
-    // => Create relationship btw. photo to entry
+        db.Entry.create(entryQuery)
+        .then(function(newEntry) {
+            res.send('Success');
+        })
+        .catch(function(err){
+          res.status(404).json(err)
+        })
+      })
+      .then(function() {
+        res.send('Success');
+      })
+      .catch(function(err){
+        res.status(404).json(err)
+      })
 
     res.status(201).send();
+    next();
 
   },
 
   getPhoto: function(req, res, next) {
     console.log('inside getPhoto');
-    console.log('getPhoto req.body:', req.body);
 
-    var photoId = req.body.photoId
-    var path = '../photos/' + photoId + '.js';
-    // read file w/ path name
-    var photo = fs.readFile(path, (err, data) => {
-        if (err) {
-            console.log('error getting photo:', err);
-        } else {
-            res.writeHead(200, {'Content-Type': 'image/jpeg'});
-            res.json(data);
-        }
-    });
+    // TODO: Query DB for photoId on given entry via entryId
+
+    // Get entryId from query
+    // var entryId = req.query.q;
+
+    // db.Photo.findAll({ 
+    //   where: { entryId: entryId } // need to set relationship
+    // })
+    // .then(function(entries){
+    //   var photoPath = path.join(__dirname, '../photos', photoId + '.js');
+    //   var photo = fs.readFile(photoPath, (err, data) => {
+    //       if (err) {
+    //           console.log('error getting photo:', err);
+    //       } else {
+    //           res.set('Content-Type', 'image/jpeg');
+    //           res.send(data);
+    //       }
+    //   });
+    // })
+    // .catch(function(err){
+    //   res.status(404).json({error: 'Error retrieving entires: ' + err});
+    // });
+
+    // FOR TESTING ONLY
+    // var photoPath = path.join(__dirname, '../photos/AJGvJDuEO2.js');
+    // var photo = fs.readFile(photoPath, (err, data) => {
+    //     if (err) {
+    //         console.log('error getting photo:', err);
+    //     } else {
+    //         res.set('Content-Type', 'image/jpeg');
+    //         res.send(data);
+    //     }
+    // });
+    
   }, 
 
 // DELETE AFTER TESTING
-  getPhotosTest: function(req, res, next) {
-    db.Photo.findAll({})
-    .then(function(entries){
-      res.send(entries);
-    })
-    .catch(function(err){
-      res.status(404).json({error: 'Error retrieving entires: ' + err});
-    });
-  }
+  // getPhotosFromDBTest: function(req, res, next) {
+  //   db.Photo.findAll({})
+  //   .then(function(entries){
+  //     res.send(entries);
+  //   })
+  //   .catch(function(err){
+  //     res.status(404).json({error: 'Error retrieving entires: ' + err});
+  //   });
+  // }
 
 };

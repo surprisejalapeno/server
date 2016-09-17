@@ -11,7 +11,12 @@ var User = sequelize.define('user', {
 // Define the model that corresponds to the entry table in the database.
 var Entry = sequelize.define('entry', {
   text: Sequelize.STRING,
-  location: Sequelize.STRING
+  location: Sequelize.STRING,
+});
+
+var Photo = sequelize.define('photo', {
+  // This will be a reference to the file stored on server
+  source: Sequelize.STRING
 });
 
 var Relationships = sequelize.define('relationships', {
@@ -58,6 +63,7 @@ var Request = sequelize.define('request', {
 // after creating a new instance of Entry
 Entry.belongsTo(User)
 Request.belongsTo(User)
+Entry.belongsTo(Photo)
 
 User.hasMany(Entry);
 User.hasMany(Request);
@@ -66,10 +72,11 @@ User.hasMany(Request);
 User.sync();
 Entry.sync();
 Relationships.sync();
-Request.sync()
+Request.sync();
+Photo.sync();
 
 module.exports.User = User;
-
 module.exports.Entry = Entry;
 module.exports.Relationships = Relationships;
 module.exports.Request = Request;
+module.exports.Photo = Photo;
